@@ -1,0 +1,29 @@
+{
+  "name": "wayfinder-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A* pathfinding on Summoner's Rift in the browser. The map loads at runtime from Riot's Data Dragon CDN.",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/cinzel": "^5.2.5",
+    "@fontsource/inter": "^5.2.5",
+    "next": "15.5.27",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.27",
+    "typescript": "^5"
+  }
+}

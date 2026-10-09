@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>League WayFinder</title>
+    <style>
+        :root {
+            --primary-color: #0A1428;
+            --secondary-color: #091428;
+            --accent-color: #C8AA6E;
+            --text-color: #F0E6D2;
+            --dark-bg: #010A13;
+            --panel-bg: #1E2328;
+            --panel-border: #463714;
+            --btn-hover: #785A28;
+            --start-color: #00ff00; /* Green for start marker */
+            --end-color: #ff0000; /* Red for end marker */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            padding: 15px 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (min-width: 1200px) {
+            .main-container {
+                flex-direction: row;
+            }
+        }
+
+        .instruction-panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .instructions-title {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 8px;
+        }
+
+        .instruction-step {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        .controls {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100px;
+            padding: 8px 12px;
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 150px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .map-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .map-container-wrapper {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 70%;
+            /* Aspect ratio */
+            margin: 0 auto;
+            border: 2px solid var(--panel-border);
+            background-color: var(--panel-bg);
+            overflow: hidden;
+            cursor: crosshair;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .map-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #map-image {
+            display: block;
+            width: 800px;
+            height: 800px;
+        }
+
+        #pathCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #path-info {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-title {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 8px;
+        }
+
+        .info-item {
+            margin: 12px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-item strong {
+            color: var(--accent-color);
+            margin-right: 10px;
+            min-width: 120px;
+        }
+
+        .marker {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #start-marker {
+            background-color: var(--start-color);
+        }
+
+        #end-marker {
+            background-color: var(--end-color);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            display: none;
+            color: var(--text-color);
+            z-index: 3;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 1200px) {
+            .sidebar {
+                width: 400px;
+            }
+        }
+
+        .point-coordinates {
+            display: flex;
+            gap: 10px;
+            font-size: 16px;
+            margin-top: 5px;
+            color: #aaa;
+        }
+
+        footer {
+            text-align: center;
+            padding: 18px 20px; font-size: 12px; line-height: 1.6; opacity: .8;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            margin-top: 20px;
+        }
+
+        .waypoint-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 5px;
+            background-color: var(--panel-bg);
+            border-radius: 4px;
+        }
+
+        .waypoint-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            margin-bottom: 4px;
+            background-color: var(--dark-bg);
+            border-radius: 4px;
+        }
+
+        .waypoint-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .segment-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .segment-number {
+            font-weight: bold;
+        }
+
+        .segment-time {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>League WayFinder</h1>
+    </header>
+
+    <div class="main-container">
+        <div class="sidebar">
+
+            <div class="instruction-panel">
+                <h2 class="instructions-title">How to Use This Tool</h2>
+
+                <div class="instruction-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Add Waypoints</h3>
+                        <p>Left-click anywhere on the map to add waypoints. Each click adds a new point.</p>
+                    </div>
+                </div>
+
+                <div class="instruction-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Remove Waypoints</h3>
+                        <p>Right-click to remove the last added waypoint.</p>
+                    </div>
+                </div>
+
+                <div class="instruction-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Calculate Path</h3>
+                        <p>The path will automatically calculate once you have at least 2 waypoints.</p>
+                    </div>
+                </div>
+                
+                <div class="instruction-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Waypoints</h3>
+                        <div id="waypoint-coordinates" class="waypoint-list">
+                            <div class="waypoint-item">
+                                <div class="waypoint-color" style="background-color: var(--start-color);"></div>
+                                <div class="waypoint-info">
+                                    <span>Start: (0, 0)</span>
+                                    <span class="segment-time">0s</span>
+                                </div>
+                            </div>
+                            <!-- More waypoints will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="controls">
+                <div class="control-group">
+                    <label for="champion-speed">Champion Speed:</label>
+                    <input type="number" id="champion-speed" min="100" max="1000" value="{{ champion_speed }}">
+                </div>
+
+                <div class="button-group">
+                    <button id="calculate-btn" disabled>Recalculate Path</button>
+                    <button id="reset-btn">Reset</button>
+                </div>
+            </div>
+
+            <div id="path-info" style="display: none;">
+                <h2 class="info-title">Path Information</h2>
+                <div class="info-item">
+                    <strong>Distance:</strong> <span id="path-distance">0</span> &nbsp; game units
+                </div>
+                <div class="info-item">
+                    <strong>Travel Time:</strong> <span id="travel-time">0</span> &nbsp; seconds
+                </div>
+            </div>
+        </div>
+
+        <div class="map-wrapper">
+            <div class="map-container-wrapper">
+                <div class="map-container" id="map-container">
+                    <img id="map-image" src="{{ map_url }}" alt="Summoner's Rift minimap from Riot Data Dragon" crossorigin="anonymous">
+                    <canvas id="pathCanvas"></canvas>
+                    <div class="loading" id="loading">Calculating optimal path...</div>
+                    <!-- We'll create markers dynamically in JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        League Tools isn&rsquo;t endorsed by Riot Games and doesn&rsquo;t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.
+    </footer>
+
+    <script>
+        // Replace your existing script with this updated version
+        document.addEventListener('DOMContentLoaded', function () {
+            const mapContainer = document.querySelector('.map-container');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const championSpeed = document.getElementById('champion-speed');
+            const pathInfo = document.getElementById('path-info');
+            const pathDistance = document.getElementById('path-distance');
+            const travelTime = document.getElementById('travel-time');
+            const loading = document.getElementById('loading');
+            const waypointCoordinates = document.getElementById('waypoint-coordinates');
+            const pathCanvas = document.getElementById('pathCanvas');
+            const mapImage = document.getElementById('map-image');
+
+            const GRID_SIZE = {{ grid_size }};
+            const GRID_TO_GAME_UNITS = {{ grid_to_game_units | default(100) }};
+            let cellWidth, cellHeight;
+            let waypoints = []; // Array to store all waypoints
+            let walkableGrid = null;
+            let markers = []; // Array to store marker elements
+
+            // Calculate cell dimensions based on the actual rendered size of the map container
+            function updateCellDimensions() {
+                const mapWidth = mapImage.clientWidth;
+                const mapHeight = mapImage.clientHeight;
+                cellWidth = mapWidth / GRID_SIZE;
+                cellHeight = mapHeight / GRID_SIZE;
+
+                // Update canvas size to match map size
+                pathCanvas.width = mapWidth;
+                pathCanvas.height = mapHeight;
+            }
+
+            // Update dimensions once the map image is loaded
+            mapImage.onload = function() {
+                updateCellDimensions();
+            };
+
+            // Update dimensions initially and on window resize
+            updateCellDimensions();
+            window.addEventListener('resize', function () {
+                updateCellDimensions();
+
+                // Reposition all markers
+                updateMarkerPositions();
+
+                // Redraw path if we have waypoints
+                if (waypoints.length > 1) {
+                    fetchAndDrawPath();
+                }
+            });
+
+            // Function to update positions of all markers
+            function updateMarkerPositions() {
+                markers.forEach((marker, index) => {
+                    if (waypoints[index]) {
+                        marker.style.left = (waypoints[index].x * cellWidth + cellWidth/2) + 'px';
+                        marker.style.top = (waypoints[index].y * cellHeight + cellHeight/2) + 'px';
+                    }
+                });
+            }
+
+            // Create a new marker and add it to the DOM
+            function createMarker(x, y, index) {
+                const marker = document.createElement('div');
+                marker.className = 'marker';
+                marker.style.backgroundColor = getMarkerColor(index);
+                marker.style.left = x + 'px';
+                marker.style.top = y + 'px';
+                marker.style.display = 'block';
+                
+                // Add number label to marker
+                const label = document.createElement('span');
+                label.textContent = index + 1;
+                label.style.position = 'absolute';
+                label.style.top = '50%';
+                label.style.left = '50%';
+                label.style.transform = 'translate(-50%, -50%)';
+                label.style.fontSize = '10px';
+                label.style.fontWeight = 'bold';
+                label.style.color = '#000';
+                
+                marker.appendChild(label);
+                mapContainer.appendChild(marker);
+                
+                return marker;
+            }
+
+            // Generate a color for a marker based on its index
+            function getMarkerColor(index) {
+                if (index === 0) return 'var(--start-color)'; // First point is green
+                if (index === waypoints.length - 1) return 'var(--end-color)'; // Last point is red
+                
+                // Generate colors for intermediate points
+                const hue = (index * 30) % 360; // Spread colors around the hue circle
+                return `hsl(${hue}, 100%, 50%)`;
+            }
+
+            // Update waypoint list display
+            function updateWaypointDisplay(segmentTimes = []) {
+                const waypointList = document.getElementById('waypoint-coordinates');
+                waypointList.innerHTML = '';
+
+                waypoints.forEach((point, index) => {
+                    if (index === 0) {
+                        // Display the starting point
+                        const item = document.createElement('div');
+                        item.className = 'waypoint-item';
+
+                        const color = document.createElement('div');
+                        color.className = 'waypoint-color';
+                        color.style.backgroundColor = getMarkerColor(index);
+                        item.appendChild(color);
+
+                        const info = document.createElement('div');
+                        info.className = 'waypoint-info';
+                        info.textContent = `Start: (${point.x}, ${point.y})`;
+                        item.appendChild(info);
+
+                        waypointList.appendChild(item);
+                    }
+
+                    if (index < waypoints.length - 1) {
+                        // Display the segment
+                        const item = document.createElement('div');
+                        item.className = 'waypoint-item';
+
+                        // Segment number and time
+                        const segmentInfo = document.createElement('div');
+                        segmentInfo.className = 'segment-info';
+
+                        // Segment number with colors
+                        const segmentNumber = document.createElement('span');
+                        segmentNumber.className = 'segment-number';
+                        segmentNumber.innerHTML = `
+                            <span style="color: ${getMarkerColor(index)}">${index + 1}</span> - 
+                            <span style="color: ${getMarkerColor(index + 1)}">${index + 2}</span>
+                        `;
+                        segmentInfo.appendChild(segmentNumber);
+
+                        // Segment time
+                        if (segmentTimes[index]) {
+                            const time = document.createElement('span');
+                            time.className = 'segment-time';
+                            time.textContent = `${segmentTimes[index].toFixed(2)}s`;
+                            segmentInfo.appendChild(time);
+                        }
+
+                        item.appendChild(segmentInfo);
+                        waypointList.appendChild(item);
+                    }
+                });
+            }
+            
+            // Fetch the walkable grid data
+            fetch('/api/map-data')
+                .then(response => response.json())
+                .then(data => {
+                    walkableGrid = data.grid;
+                })
+                .catch(error => {
+                    console.error('Error fetching map data:', error);
+                    alert('Failed to load map data. Please refresh the page.');
+                });
+
+            // Handle map clicks to add waypoints
+            mapContainer.addEventListener('click', function (e) {
+                if (e.button !== 0) return; // Only process left clicks
+
+                const rect = mapImage.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Convert to grid coordinates
+                const gridX = Math.floor(x / cellWidth);
+                const gridY = Math.floor(y / cellHeight);
+
+                // Check if position is walkable
+                if (walkableGrid && gridX >= 0 && gridY >= 0 && gridX < GRID_SIZE && gridY < GRID_SIZE) {
+                    if (walkableGrid[gridX][gridY] === 0) {
+                        alert('This area is not walkable. Please select another point.');
+                        return;
+                    }
+
+                    // Add new waypoint
+                    const newWaypoint = { x: gridX, y: gridY };
+                    waypoints.push(newWaypoint);
+                    
+                    // Create and store a new marker
+                    const marker = createMarker(x, y, waypoints.length - 1);
+                    markers.push(marker);
+                    
+                    // Update previous marker colors (in case we changed from start/end to intermediate)
+                    markers.forEach((marker, index) => {
+                        marker.style.backgroundColor = getMarkerColor(index);
+                    });
+                    
+                    // Update waypoint display
+                    updateWaypointDisplay();
+
+                    // Calculate path if we have at least 2 waypoints
+                    if (waypoints.length >= 2) {
+                        calculateBtn.disabled = false;
+                        fetchAndDrawPath();
+                    } else {
+                        calculateBtn.disabled = true;
+                    }
+                }
+            });
+
+            // Right-click to remove the last added waypoint
+            mapContainer.addEventListener('contextmenu', function (e) {
+                e.preventDefault(); // Prevent default context menu
+                
+                if (waypoints.length > 0) {
+                    // Remove the last waypoint
+                    waypoints.pop();
+                    
+                    // Remove the last marker from DOM
+                    const lastMarker = markers.pop();
+                    if (lastMarker) {
+                        mapContainer.removeChild(lastMarker);
+                    }
+                    
+                    // Update colors of remaining markers
+                    markers.forEach((marker, index) => {
+                        marker.style.backgroundColor = getMarkerColor(index);
+                    });
+                    
+                    // Update waypoint display
+                    updateWaypointDisplay();
+                    
+                    // Recalculate path if we still have at least 2 waypoints
+                    if (waypoints.length >= 2) {
+                        fetchAndDrawPath();
+                    } else {
+                        // Clear the canvas if we don't have enough waypoints
+                        const ctx = pathCanvas.getContext('2d');
+                        ctx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+                        pathInfo.style.display = 'none';
+                        calculateBtn.disabled = true;
+                    }
+                }
+            });
+
+            // Function to fetch path data and draw it
+            function fetchAndDrawPath() {
+                if (waypoints.length < 2) return;
+
+                loading.style.display = 'block';
+
+                const formData = new FormData();
+                formData.append('waypoints', JSON.stringify(waypoints));
+                formData.append('champion_speed', championSpeed.value);
+
+                fetch('/api/calculate-multi-path', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Use the segment times from the backend
+                    const segmentTimes = data.segment_times;
+                    
+                    // Update displays
+                    drawPath(data.paths, segmentTimes);
+                    updateWaypointDisplay(segmentTimes);
+                    pathDistance.textContent = data.total_distance;
+                    travelTime.textContent = data.total_time;  // Use total_time from backend
+                    pathInfo.style.display = 'block';
+                    loading.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loading.style.display = 'none';
+                    alert('An error occurred while calculating the path.');
+                });
+            }
+
+            // Calculate button click handler
+            calculateBtn.addEventListener('click', fetchAndDrawPath);
+
+            // Champion speed input change handler
+            championSpeed.addEventListener('change', function() {
+                if (waypoints.length >= 2) {
+                    fetchAndDrawPath();
+                }
+            });
+
+            // Function to draw the path on the canvas
+            function drawPath(pathSegments, segmentTimes) {
+                const canvas = pathCanvas;
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                pathSegments.forEach((segment, index) => {
+                    if (segment.length > 1) {
+                        const segmentColor = getPathColor(index, pathSegments.length);
+                        ctx.beginPath();
+                        ctx.strokeStyle = segmentColor;
+                        ctx.lineWidth = 5;
+
+                        // Draw the path
+                        const firstPoint = segment[0];
+                        const x1 = firstPoint[0] * canvas.width / GRID_SIZE + canvas.width / (2 * GRID_SIZE);
+                        const y1 = firstPoint[1] * canvas.height / GRID_SIZE + canvas.height / (2 * GRID_SIZE);
+                        ctx.moveTo(x1, y1);
+
+                        for (let i = 1; i < segment.length; i++) {
+                            const point = segment[i];
+                            const x = point[0] * canvas.width / GRID_SIZE + canvas.width / (2 * GRID_SIZE);
+                            const y = point[1] * canvas.height / GRID_SIZE + canvas.height / (2 * GRID_SIZE);
+                            ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+
+                        // Add time label at the midpoint of the segment
+                        if (segmentTimes[index]) {
+                            const midIndex = Math.floor(segment.length / 2);
+                            const midPoint = segment[midIndex];
+                            const labelX = midPoint[0] * canvas.width / GRID_SIZE + canvas.width / (2 * GRID_SIZE);
+                            const labelY = midPoint[1] * canvas.height / GRID_SIZE + canvas.height / (2 * GRID_SIZE);
+
+                            // Add a background to the text for better visibility
+                            const text = `${segmentTimes[index].toFixed(2)}s`;
+                            ctx.font = 'bold 14px Arial';
+                            const textWidth = ctx.measureText(text).width;
+
+                            // Draw background
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                            ctx.fillRect(
+                                labelX - textWidth / 2 - 5,
+                                labelY - 12,
+                                textWidth + 10,
+                                20
+                            );
+
+                            // Draw text
+                            ctx.fillStyle = '#FFFFFF'; // White text for contrast
+                            ctx.textAlign = 'center';
+                            ctx.fillText(text, labelX, labelY);
+                        }
+                    }
+                });
+            }
+
+            // Generate a color for path segment based on index
+            function getPathColor(index, totalSegments) {
+                if (index === 0) return '#55FF55'; // First segment is green
+                if (index === totalSegments - 1) return '#FF5555'; // Last segment is red
+                
+                // Generate colors for intermediate segments
+                const hue = (index * 30) % 360; // Spread colors around the hue circle
+                return `hsl(${hue}, 100%, 60%)`;
+            }
+
+            // Reset everything
+            resetBtn.addEventListener('click', function () {
+                waypoints = [];
+                
+                // Remove all markers
+                markers.forEach(marker => {
+                    mapContainer.removeChild(marker);
+                });
+                markers = [];
+                
+                calculateBtn.disabled = true;
+                pathInfo.style.display = 'none';
+                waypointCoordinates.innerHTML = 'No waypoints set';
+
+                // Clear the canvas
+                const ctx = pathCanvas.getContext('2d');
+                ctx.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+            });
+        });
+    </script>
+</body>
+
+</html>
