@@ -94,6 +94,9 @@ input[type="range"] { flex: 1; accent-color: var(--gold); }
 
 .legal { max-width: 900px; margin: 40px auto 0; padding: 24px 0 36px; text-align: center; font-size: .72rem; line-height: 1.6; color: rgba(160,155,140,.75); border-top: 1px solid rgba(200,170,110,.08); }
 
+@media (min-width: 961px) {
+  .map-box { max-width: min(820px, calc(100vh - 150px)); }
+}
 @media (max-width: 960px) {
   .layout { grid-template-columns: 1fr; }
   .map-wrap { order: -1; }

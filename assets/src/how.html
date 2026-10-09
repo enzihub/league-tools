@@ -1,0 +1,46 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="art.css">
+<style>
+  body { width: 1000px; height: 560px; }
+  .card { width: 1000px; height: 560px; padding: 40px 44px; }
+  h2 { font-family: Cinzel, serif; color: var(--gold); font-size: 26px; letter-spacing: .06em; margin-top: 8px; }
+  .lanes { margin-top: 26px; display: grid; gap: 18px; }
+  .lane { display: grid; grid-template-columns: 150px 1fr; gap: 14px; align-items: stretch; }
+  .lane-label { font-family: Cinzel, serif; font-weight: 600; font-size: 15px; color: var(--gold-b); letter-spacing: .05em; padding-top: 18px; }
+  .lane-label small { display: block; font-family: Inter; font-weight: 400; color: var(--muted); letter-spacing: 0; font-size: 12px; margin-top: 6px; line-height: 1.4; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+  .step { position: relative; background: rgba(10,20,40,.75); border: 1px solid rgba(200,170,110,.25); border-radius: 12px; padding: 14px 14px 14px; margin-right: 22px; }
+  .step:last-child { margin-right: 0; }
+  .step:not(:last-child)::after { content: ''; position: absolute; right: -18px; top: 50%; width: 14px; height: 2px; background: var(--gold-d); }
+  .step:not(:last-child)::before { content: ''; position: absolute; right: -19px; top: calc(50% - 4px); border: 5px solid transparent; border-left: 6px solid var(--gold-d); transform: translateX(6px); }
+  .n { font-size: 11px; color: var(--teal); letter-spacing: .2em; font-weight: 600; }
+  .t { font-weight: 600; font-size: 15px; margin-top: 6px; color: var(--gold-b); }
+  .d { font-size: 12.5px; color: #c9c2b0; margin-top: 5px; line-height: 1.45; }
+  code { font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--gold); }
+  .foot { position: absolute; left: 44px; right: 44px; bottom: 30px; display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); border-top: 1px solid rgba(200,170,110,.15); padding-top: 14px; }
+</style></head>
+<body><div class="card">
+  <div class="eyebrow">How it works</div>
+  <h2>Everything comes from Data Dragon at runtime</h2>
+  <div class="lanes">
+    <div class="lane">
+      <div class="lane-label">Champion Mastery<small>Next.js server components</small></div>
+      <div class="steps">
+        <div class="step"><div class="n">01</div><div class="t">Latest patch</div><div class="d">Reads <code>api/versions.json</code>, or a pinned version.</div></div>
+        <div class="step"><div class="n">02</div><div class="t">Champion list</div><div class="d">Fetches <code>champion.json</code>, cached for an hour.</div></div>
+        <div class="step"><div class="n">03</div><div class="t">Search &amp; roles</div><div class="d">Filters by name, title and every selected role.</div></div>
+        <div class="step"><div class="n">04</div><div class="t">Profile</div><div class="d">Lore, spells, ratings and stats from <code>champion/&lt;id&gt;.json</code>.</div></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-label">Wayfinder<small>Browser (Next.js) or FastAPI</small></div>
+      <div class="steps">
+        <div class="step"><div class="n">01</div><div class="t">Minimap</div><div class="d">Loads <code>map11.png</code>, Summoner’s Rift.</div></div>
+        <div class="step"><div class="n">02</div><div class="t">100 × 100 grid</div><div class="d">Dark pixels are walls; bright cells are walkable.</div></div>
+        <div class="step"><div class="n">03</div><div class="t">A* search</div><div class="d">8 directions, cost 10 / 14, Euclidean heuristic.</div></div>
+        <div class="step"><div class="n">04</div><div class="t">Travel time</div><div class="d">Path length in game units ÷ champion speed.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span>No Riot art or data is stored in the repository.</span><span>1 cell ≈ 149 game units</span></div>
+</div></body></html>
