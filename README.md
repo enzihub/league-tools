@@ -1,12 +1,11 @@
 <div align="center">
 
-<a href="https://enzihub.github.io/league-tools/">
+<a href="#see-it-work">
   <img src="assets/hero.png" width="1000" alt="League Tools by Enzi Studio: browse every champion, then plot the fastest route across Summoner's Rift with A* pathfinding. Shown with real screenshots of the Champion Mastery grid and a Wayfinder route.">
 </a>
 
 <br>
 
-**[Website](https://enzihub.github.io/league-tools/)** ·
 **[Demo](#see-it-work)** ·
 **[Features](#features)** ·
 **[How it works](#how-it-works)** ·
